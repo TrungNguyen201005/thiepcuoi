@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Thiệp Cưới - Phong Bì</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@500;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,500&family=Montserrat:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#fdf1ef;
+    --green:#e8899b;
+    --green-dark:#7a1128;
+    --gold:#e8a0ae;
+    --ink:#5a2530;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html,body{height:100%;}
+    body{
+    font-family:'Cormorant Garamond', serif;
+    background: var(--cream);
+    display:flex;
+    justify-content:center;
+    min-height:100%;
+    padding: 120px env(safe-area-inset-right,20px) calc(30px + env(safe-area-inset-bottom,0px)) env(safe-area-inset-left,20px);
+    color: var(--ink);
+  }
+  .page{
+    width:100%;
+    max-width:400px;
+  }
+  .heading{
+    text-align:center;
+    font-family:'Dancing Script', cursive;
+    font-size:30px;
+    color:#7a1128;
+    margin: 6px 0 18px;
+    letter-spacing:1px;
+  }
+  .scene{
+    position:relative;
+    width:100%;
+    perspective: 1400px;
+    margin-bottom: 8px;
+  }
+  .flowers-left, .flowers-right{
+    position:absolute;
+    font-size:34px;
+    z-index:5;
+    filter: drop-shadow(0 2px 3px rgba(0,0,0,0.15));
+    pointer-events:none;
+  }
+  .flowers-left{ top:-14px; left:-10px; transform: rotate(-12deg);}
+  .flowers-right{ bottom:6px; right:-8px; transform: rotate(10deg) scaleX(-1);}
+
+  .envelope{
+    position:relative;
+    width:100%;
+    aspect-ratio: 1 / 0.72;
+    cursor:pointer;
+    -webkit-tap-highlight-color: transparent;
+    overflow:visible;
+  }
+  .pocket{
+    position:absolute; inset:0;
+    background: linear-gradient(165deg, var(--green) 0%, var(--green) 62%, var(--green-dark) 100%);
+    border-radius: 6px;
+    box-shadow: 0 18px 34px rgba(40,50,25,0.35);
+    overflow:hidden;
+    z-index:3;
+  }
+  .pocket::before, .pocket::after{
+    content:"";
+    position:absolute; bottom:0; width:52%; height:100%;
+    background: linear-gradient(135deg, rgba(255,255,255,0.06), rgba(0,0,0,0.12));
+  }
+  .pocket::before{ left:0; clip-path: polygon(0 100%, 0 0, 100% 100%);}
+  .pocket::after{ right:0; clip-path: polygon(100% 100%, 100% 0, 0 100%);}
+
+  .flap{
+    position:absolute;
+    top:0; left:0; right:0;
+    height:58%;
+    background: linear-gradient(200deg, var(--green-dark) 0%, #4d0a19 100%);
+    clip-path: polygon(0 0, 100% 0, 50% 100%);
+    transform-origin: top center;
+    transition: transform 1.1s cubic-bezier(.6,-0.28,.35,1.4);
+    z-index: 6;
+    box-shadow: 0 6px 10px rgba(0,0,0,0.2);
+  }
+  .seal{
+    position:absolute;
+    left:50%; top:44%;
+    transform: translate(-50%,-50%);
+    width:40px; height:40px;
+    border-radius:50%;
+    background: radial-gradient(circle at 35% 30%, #e6d2a6, var(--gold));
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Dancing Script', cursive;
+    color:#6b1d2e;
+    font-size:16px;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.3);
+    z-index:8;
+    transition: opacity .4s ease, transform .4s ease;
+  }
+
+  .photo{
+    position:absolute;
+    width:46%;
+    aspect-ratio: 3/4;
+    background: #f4f2ea;
+    border: 6px solid #f4f2ea;
+    border-radius:2px;
+    box-shadow: 0 10px 18px rgba(0,0,0,0.3);
+    display:flex; align-items:center; justify-content:center;
+    text-align:center;
+    font-family:'Montserrat', sans-serif;
+    font-size:11px;
+    color:#9a9484;
+    z-index:2;
+    transition: transform 1s cubic-bezier(.2,.8,.2,1), opacity .8s ease;
+  }
+  .photo .icon{ font-size:22px; display:block; margin-bottom:6px;}
+
+  .envelope.open .photo{
+    box-shadow: 0 14px 24px rgba(0,0,0,0.32);
+  }
+  .photo-a{ left:6%; top:4%; transform: rotate(-8deg); z-index:1;}
+  .photo-b{ right:4%; top:-2%; transform: rotate(7deg); z-index:2;}
+
+  .note{
+    position:absolute;
+    left:50%; bottom:6%;
+    transform: translate(-50%, 20px) rotate(-2deg);
+    width:60%;
+    background:#fbf8ef;
+    border-radius:2px;
+    box-shadow: 0 10px 16px rgba(0,0,0,0.25);
+    padding:14px 10px;
+    text-align:center;
+    z-index:4;
+    opacity:0;
+    transition: transform 1s cubic-bezier(.2,.8,.2,1) .15s, opacity .8s ease .15s;
+  }
+  .note .label{ font-family:'Montserrat',sans-serif; font-size:9px; letter-spacing:2px; color:#8a8460; text-transform:uppercase;}
+  .note .date{ font-family:'Cormorant Garamond',serif; font-weight:600; font-size:19px; color:var(--green-dark); margin:4px 0;}
+  .note .sub{ font-family:'Dancing Script',cursive; font-size:14px; color:#b06776;}
+
+  /* OPEN STATE */
+  .envelope.open .flap{ transform: rotateX(178deg); }
+  .envelope.open .seal{ opacity:0; transform: translate(-50%,-50%) scale(.4);}
+
+  /* Khi mở: 2 ảnh trượt từ trong phong bì lên trên và tách sang 2 bên */
+  .photo img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  border-radius:2px;
+}
+  .envelope.open .photo-a{
+    z-index:7;
+    transform: translate(-12%,-58%) rotate(-9deg);
+  }
+  .envelope.open .photo-b{
+    z-index:7;
+    transform: translate(12%,-62%) rotate(8deg);
+  }
+  .envelope.open .note{ transform: translate(-50%,-6px) rotate(-2deg); opacity:1; }
+
+  .hint{
+    text-align:center;
+    font-family:'Montserrat',sans-serif;
+    font-size:11px;
+    letter-spacing:1.5px;
+    color:#b06776;
+    margin: 14px 0 22px;
+    text-transform:uppercase;
+    opacity:.85;
+  }
+
+  .names{
+    text-align:center;
+    font-family:'Dancing Script', cursive;
+    font-size:34px;
+    color: var(--green-dark);
+    opacity:0;
+    transform: translateY(10px);
+    transition: opacity .8s ease, transform .8s ease;
+  }
+  .weddate{
+    text-align:center;
+    font-family:'Cormorant Garamond', serif;
+    font-size:19px;
+    letter-spacing:3px;
+    color: var(--ink);
+    margin: 6px 0 26px;
+    opacity:0;
+    transform: translateY(10px);
+    transition: opacity .8s ease .1s, transform .8s ease .1s;
+  }
+  .reveal.show .names, .reveal.show .weddate{ opacity:1; transform:none; }
+
+  .calendar-card{
+    background: var(--green-dark);
+    border-radius: 6px;
+    overflow:hidden;
+    display:flex;
+    color:#fbe3e7;
+    opacity:0;
+    transform: translateY(14px);
+    transition: opacity .9s ease .25s, transform .9s ease .25s;
+  }
+  .reveal.show .calendar-card{ opacity:1; transform:none; }
+  .cal-photo{
+    width:34%;
+    background:rgba(255,255,255,0.08);
+    border:1px solid rgba(255,255,255,0.25);
+    margin: 12px 0 12px 12px;
+    border-radius:2px;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Montserrat',sans-serif;
+    font-size:9px;
+    color:#f3c8cf;
+    text-align:center;
+    padding:6px;
+  }
+  .cal-body{
+    flex:1;
+    padding: 14px 14px 14px 10px;
+    font-family:'Montserrat',sans-serif;
+  }
+  .cal-title{ font-size:14px; letter-spacing:1px; margin-bottom:8px; text-align:right; color:#fbe3e7;}
+  table.cal{ width:100%; border-collapse:collapse; font-size:11px; }
+  table.cal th{ color:#e0a9b4; font-weight:500; padding:2px 3px; text-align:center; }
+  table.cal td{ text-align:center; padding:3px 3px; color:#fbe3e7; }
+  table.cal td.today{
+    background: #fff;
+    color:#7a1128;
+    border-radius:50%;
+    font-weight:700;
+  }
+
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){ --cream:#efece1; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="heading">We got married</div>
+
+  <div class="scene">
+    <span class="flowers-left">🌹🌿</span>
+    <span class="flowers-right">🌸💮</span>
+
+    <div class="envelope" id="envelope" role="button" aria-label="Mở thiệp">
+      <div class="photo photo-a"><img src="anh2.png"></div>
+      <div class="photo photo-b"><img src="anh2.png"></div>
+
+      <div class="note">
+        <div class="label">Ngày Chung Đôi</div>
+        <div class="date" id="noteDate">26 . 04 . 2026</div>
+        <div class="sub">We're getting married!</div>
+      </div>
+
+      <div class="pocket"></div>
+      <div class="flap"><div class="seal">NT</div></div>
+    </div>
+  </div>
+
+  <div class="hint" id="hint">Chạm vào phong bì để mở thiệp</div>
+
+  <div class="reveal" id="reveal">
+    <div class="names">Nguyên &amp; Nhung</div>
+    <div class="weddate">26 · 04 · 2026</div>
+
+    <div class="calendar-card">
+      <div class="cal-photo">Ảnh<br>của bạn</div>
+      <div class="cal-body">
+        <div class="cal-title">Tháng 04 . 2026</div>
+        <table class="cal">
+          <tr><th>M</th><th>T</th><th>W</th><th>T</th><th>F</th><th>S</th><th>S</th></tr>
+          <tr><td></td><td></td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td></tr>
+          <tr><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td><td>11</td><td>12</td></tr>
+          <tr><td>13</td><td>14</td><td>15</td><td>16</td><td>17</td><td>18</td><td>19</td></tr>
+          <tr><td>20</td><td>21</td><td>22</td><td>23</td><td>24</td><td>25</td><td class="today">26</td></tr>
+          <tr><td>27</td><td>28</td><td>29</td><td>30</td><td></td><td></td><td></td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const env = document.getElementById('envelope');
+  const reveal = document.getElementById('reveal');
+  const hint = document.getElementById('hint');
+  let opened = false;
+
+  env.addEventListener('click', () => {
+    opened = !opened;
+    env.classList.toggle('open', opened);
+    if(opened){
+      hint.textContent = 'Chạm để đóng thiệp lại';
+      setTimeout(() => reveal.classList.add('show'), 500);
+    } else {
+      hint.textContent = 'Chạm vào phong bì để mở thiệp';
+      reveal.classList.remove('show');
+    }
+  });
+</script>
+</body>
+</html>
+
